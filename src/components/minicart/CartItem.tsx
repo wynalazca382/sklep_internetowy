@@ -1,6 +1,6 @@
 import { FaTrashAlt } from "react-icons/fa"
 
-import { Product } from "../../types.d"
+import { Product } from "../../data/ProductModel"
 import Image from "next/image"
 import { useCartStore } from "../../stores/useCartStore"
 

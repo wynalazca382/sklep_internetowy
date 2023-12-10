@@ -1,6 +1,6 @@
 import ProductCard from "./ProductCard"
 
-import { Product } from "@/types.d"
+import { Product } from "@/data/ProductModel"
 
 interface Props {
 	products: Product[]

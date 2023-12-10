@@ -2,7 +2,12 @@ import Image from "next/image"
 
 import { useCartStore } from "../../stores/useCartStore"
 
-import { Product } from "@/types.d"
+import { Product } from "@/data/ProductModel"
+
+const mongoose = require('mongoose');
+const dbURI = require('./dbConfig'); // Importuj adres URI bazy danych
+
+// Model produktu (zakładając, że jest już zdefiniowany)
 
 interface Props {
 	product: Product
