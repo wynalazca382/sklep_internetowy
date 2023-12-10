@@ -1,14 +1,14 @@
-// components/Login.tsx
-import { SignIn, SignedOut } from '@clerk/clerk-react';
+import { UserButton, SignedIn, SignedOut, SignIn } from "@clerk/nextjs";
 
-const Login = () => {
+export default function Home() {
   return (
     <div>
+      <SignedIn>
+        <UserButton afterSignOutUrl="/" />
+      </SignedIn>
       <SignedOut>
-        <SignIn />
+        <button onClick={() => Clerk.openSignIn()}>Zaloguj się</button>
       </SignedOut>
     </div>
   );
-};
-
-export default Login;
+}
