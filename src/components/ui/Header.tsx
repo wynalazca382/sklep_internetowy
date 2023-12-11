@@ -7,9 +7,12 @@ interface Props {
   onCartIconClick: () => void;
 }
 
-const Header = ({ onCartIconClick }: Props) => {
-  const cart = useFromStore(useCartStore, (state) => state.cart);
-
+export default function Header({ onCartIconClick }: Props) {
+	const cart = useFromStore(useCartStore, state => state.cart)
+	let totalitems = 0
+	if (cart) {
+		totalitems = cart.reduce((acc, product) => acc + (product.quantity as number), 0)
+	}
   return (
     <header className='bg-gray-900 text-white py-4 flex items-center justify-between h-14 sticky top-0 z-10'>
       <nav className='container mx-auto md:w-10/12 px-4 flex justify-between items-center'>
@@ -22,9 +25,7 @@ const Header = ({ onCartIconClick }: Props) => {
             onClick={onCartIconClick}
           >
             <FiShoppingCart />
-            <div className='text-white rounded-full bg-blue-700 w-5 h-5 text-sm -ml-1'>
-              {cart?.length}
-            </div>
+            <div className='text-white rounded-full bg-blue-700 w-5 h-5 text-sm -ml-1'>{totalitems}</div>
           </button>
           <Login />
         </div>
@@ -32,5 +33,3 @@ const Header = ({ onCartIconClick }: Props) => {
     </header>
   );
 };
-
-export default Header;

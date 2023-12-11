@@ -12,6 +12,7 @@ interface State {
 interface Actions {
 	addToCart: (Item: Product) => void
 	removeFromCart: (Item: Product) => void
+	clearCart: () => void
 }
 
 const INITIAL_STATE: State = {
@@ -55,6 +56,9 @@ export const useCartStore = create(
 					totalItems: state.totalItems - 1,
 					totalPrice: state.totalPrice - product.price,
 				}))
+			},
+			clearCart: () => {
+				set({ cart: [] }); 
 			},
 		}),
 		{
