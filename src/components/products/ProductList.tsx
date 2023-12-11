@@ -1,9 +1,9 @@
 import ProductCard from "./ProductCard"
 
-import { Product } from "@/data/ProductModel"
+import { Product, IProduct } from "./ProductModel"; 
 
 interface Props {
-	products: Product[]
+	products: IProduct[]
 }
 
 export default function ProductList({ products }: Props) {

@@ -1,14 +1,11 @@
 ﻿import { Product } from "../components/products/ProductModel";
 
 require('dotenv').config();
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const mongoURI = process.env.dbURI;
+const mongoURI = process.env.dbURI||'mongodb+srv://konradwarchol7:cGjzPJIbPy38zrbx@cluster0.sgownai.mongodb.net/';
 
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(mongoURI)
 .then(async () => {
   console.log('Connected to MongoDB');
 

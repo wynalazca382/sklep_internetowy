@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 interface IProduct extends Document {
   id: number;
@@ -30,5 +30,8 @@ const productSchema = new Schema<IProduct>({
   quantity: Number,
 });
 
-export const Product = mongoose.model<IProduct>('Product', productSchema);
+// Sprawdź, czy model już istnieje, zanim go zdefiniujesz
+const Product = mongoose.models.Product || mongoose.model<IProduct>('Product', productSchema);
+
+export { Product };
 export type { IProduct };

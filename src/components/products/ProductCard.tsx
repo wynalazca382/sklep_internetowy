@@ -2,15 +2,12 @@ import Image from "next/image"
 
 import { useCartStore } from "../../stores/useCartStore"
 
-import { Product } from "@/data/ProductModel"
+import { Product, IProduct } from "./ProductModel"; 
 
 const mongoose = require('mongoose');
-const dbURI = require('./dbConfig'); // Importuj adres URI bazy danych
-
-// Model produktu (zakładając, że jest już zdefiniowany)
-
+const mongoURI = process.env.dbURI;
 interface Props {
-	product: Product
+	product: IProduct
 }
 
 export default function ProductCard({ product }: Props) {
