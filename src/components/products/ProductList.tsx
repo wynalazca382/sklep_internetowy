@@ -79,9 +79,15 @@ export default function ProductList({ products }: Props) {
       filteredProducts = filteredProducts.filter((product) => product.rating >= parseFloat(rating));
     }
 
-    if (fromPrice !== '' && toPrice !== '') {
+    if (fromPrice !== '') {
       filteredProducts = filteredProducts.filter(
-        (product) => product.price >= parseFloat(fromPrice) && product.price <= parseFloat(toPrice)
+        (product) => product.price >= parseFloat(fromPrice)
+      );
+    }
+
+    if (toPrice !== '') {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.price <= parseFloat(toPrice)
       );
     }
 
