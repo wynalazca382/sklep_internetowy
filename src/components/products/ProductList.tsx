@@ -1,61 +1,89 @@
 import ProductCard from "./ProductCard"
 import SortBy from 'sort-by'
 import { Product } from "@/types.d"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface Props {
 	products: Product[]
 }
 
-export default function ProductList({ products }: Props) {
+export default function ProductList({ products }) {
 	const [sortedProducts, setSortedProducts] = useState([...products]);
 	const [sortOption, setSortOption] = useState('default');
+	const [selectedCategory, setSelectedCategory] = useState('all');
+  
+	useEffect(() => {
+	  sortProducts(sortOption, selectedCategory);
+	}, [sortOption, selectedCategory]);
   
 	const handleSortChange = (e) => {
 	  const selectedOption = e.target.value;
 	  setSortOption(selectedOption);
+	};
+  
+	const handleCategoryChange = (e) => {
+	  const category = e.target.value;
+	  setSelectedCategory(category);
+	};
+  
+	const sortProducts = (selectedOption, category) => {
+	  let sortedProductsCopy = [...products];
   
 	  switch (selectedOption) {
 		case 'name-asc':
-		  sortByNameAsc();
+		  sortedProductsCopy = sortedProductsCopy.sort((a, b) =>
+			a.title.toUpperCase() > b.title.toUpperCase() ? 1 : -1
+		  );
 		  break;
 		case 'name-desc':
-		  sortByNameDesc();
+		  sortedProductsCopy = sortedProductsCopy.sort((a, b) =>
+			a.title.toUpperCase() < b.title.toUpperCase() ? 1 : -1
+		  );
 		  break;
 		case 'price-high':
-		  sortByPriceHigh();
+		  sortedProductsCopy = sortedProductsCopy.sort((a, b) => b.price - a.price);
 		  break;
 		case 'price-low':
-		  sortByPriceLow();
+		  sortedProductsCopy = sortedProductsCopy.sort((a, b) => a.price - b.price);
 		  break;
 		default:
-		  setSortedProducts([...products]);
 		  break;
 	  }
+  
+	  filterProducts(selectedOption, category, sortedProductsCopy);
 	};
   
-	const sortByNameAsc = () => {
-	  const sortedByNameAsc = [...products].sort((a, b) =>
-		a.title.toUpperCase() > b.title.toUpperCase() ? 1 : -1
-	  );
-	  setSortedProducts(sortedByNameAsc);
-	};
+	const filterProducts = (selectedOption, category, productsToFilter) => {
+	  let filteredProducts = [...productsToFilter];
   
-	const sortByNameDesc = () => {
-	  const sortedByNameDesc = [...products].sort((a, b) =>
-		a.title.toUpperCase() < b.title.toUpperCase() ? 1 : -1
-	  );
-	  setSortedProducts(sortedByNameDesc);
-	};
+	  if (category !== 'all') {
+		filteredProducts = productsToFilter.filter(
+		  (product) => product.category === category
+		);
+	  }
   
-	const sortByPriceHigh = () => {
-	  const sortedByPriceHigh = [...products].sort((a, b) => b.price - a.price);
-	  setSortedProducts(sortedByPriceHigh);
-	};
+	  switch (selectedOption) {
+		case 'name-asc':
+		  filteredProducts = filteredProducts.sort((a, b) =>
+			a.title.toUpperCase() > b.title.toUpperCase() ? 1 : -1
+		  );
+		  break;
+		case 'name-desc':
+		  filteredProducts = filteredProducts.sort((a, b) =>
+			a.title.toUpperCase() < b.title.toUpperCase() ? 1 : -1
+		  );
+		  break;
+		case 'price-high':
+		  filteredProducts = filteredProducts.sort((a, b) => b.price - a.price);
+		  break;
+		case 'price-low':
+		  filteredProducts = filteredProducts.sort((a, b) => a.price - b.price);
+		  break;
+		default:
+		  break;
+	  }
   
-	const sortByPriceLow = () => {
-	  const sortedByPriceLow = [...products].sort((a, b) => a.price - b.price);
-	  setSortedProducts(sortedByPriceLow);
+	  setSortedProducts(filteredProducts);
 	};
   
 	return (
@@ -70,13 +98,24 @@ export default function ProductList({ products }: Props) {
 			  <option value='price-high'>Price High to Low</option>
 			  <option value='price-low'>Price Low to High</option>
 			</select>
+			<select value={selectedCategory} onChange={handleCategoryChange}>
+			  <option value='all'>All Categories</option>
+			  {[...new Set(products.map((product) => product.category))].map(
+				(category) => (
+				  <option key={category} value={category}>
+					{category}
+				  </option>
+				)
+			  )}
+			</select>
 		  </div>
 		</div>
 		<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-		  {sortedProducts.map(product => (
+		  {sortedProducts.map((product) => (
 			<ProductCard key={product.id} product={product} />
 		  ))}
 		</div>
 	  </>
 	);
   }
+  
