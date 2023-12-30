@@ -30,9 +30,9 @@ export const useProductsStore = create<State & Actions>((set) => ({
       const collectionRef = db.collection('products');
       const snapshot = await collectionRef.get();
       const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Product[];
+        docId: doc.id,
+        ...(doc.data() as Product), // Rzutowanie na Product
+      }));
 
       console.log('Data:', data);
       set({ products: data, isLoading: false });
@@ -42,3 +42,4 @@ export const useProductsStore = create<State & Actions>((set) => ({
     }
   },
 }));
+
