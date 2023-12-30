@@ -10,15 +10,18 @@ interface Props {
 }
 
 export default function ProductList({ products, onEdit, onDelete }: Props) {
-  const [sortedProducts, setSortedProducts] = useState([...products]);
-  const [sortOption, setSortOption] = useState('default');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+	const [sortedProducts, setSortedProducts] = useState([...products]);
+	const [sortOption, setSortOption] = useState('default');
+	const [selectedCategory, setSelectedCategory] = useState('all');
+	const [ratingFilter, setRatingFilter] = useState('');
+	const [priceFrom, setPriceFrom] = useState('');
+	const [priceTo, setPriceTo] = useState('');  
 
   const router = useRouter();
 
   useEffect(() => {
-    sortProducts(sortOption, selectedCategory);
-  }, [sortOption, selectedCategory]);
+    sortProducts(sortOption, selectedCategory, ratingFilter, priceFrom, priceTo);
+  }, [sortOption, selectedCategory, ratingFilter, priceFrom, priceTo]);
 
   const handleSortChange = (e) => {
     const selectedOption = e.target.value;
@@ -30,61 +33,67 @@ export default function ProductList({ products, onEdit, onDelete }: Props) {
     setSelectedCategory(category);
   };
 
-  const sortProducts = (selectedOption, category) => {
+  const handleRatingFilterChange = (e) => {
+    const rating = e.target.value;
+    setRatingFilter(rating);
+  };
+
+  const handlePriceFromChange = (e) => {
+    const price = e.target.value;
+    setPriceFrom(price);
+  };
+
+  const handlePriceToChange = (e) => {
+    const price = e.target.value;
+    setPriceTo(price);
+  };
+
+  const sortProducts = (selectedOption, category, rating, fromPrice, toPrice) => {
     let sortedProductsCopy = [...products];
 
     switch (selectedOption) {
       case 'name-asc':
-        sortedProductsCopy = sortedProductsCopy.sort((a, b) =>
-          a.title.toUpperCase() > b.title.toUpperCase() ? 1 : -1
-        );
+        sortedProductsCopy.sort((a, b) => a.title.localeCompare(b.title));
         break;
       case 'name-desc':
-        sortedProductsCopy = sortedProductsCopy.sort((a, b) =>
-          a.title.toUpperCase() < b.title.toUpperCase() ? 1 : -1
-        );
+        sortedProductsCopy.sort((a, b) => b.title.localeCompare(a.title));
         break;
       case 'price-high':
-        sortedProductsCopy = sortedProductsCopy.sort((a, b) => b.price - a.price);
+        sortedProductsCopy.sort((a, b) => b.price - a.price);
         break;
       case 'price-low':
-        sortedProductsCopy = sortedProductsCopy.sort((a, b) => a.price - b.price);
+        sortedProductsCopy.sort((a, b) => a.price - b.price);
+        break;
+      case 'rating':
+        sortedProductsCopy.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'stock':
+        sortedProductsCopy.sort((a, b) => b.stock - a.stock);
         break;
       default:
         break;
     }
 
-    filterProducts(selectedOption, category, sortedProductsCopy);
-  };
-
-  const filterProducts = (selectedOption, category, productsToFilter) => {
-    let filteredProducts = [...productsToFilter];
+    let filteredProducts = [...sortedProductsCopy];
 
     if (category !== 'all') {
-      filteredProducts = productsToFilter.filter(
-        (product) => product.category === category
+      filteredProducts = filteredProducts.filter((product) => product.category === category);
+    }
+
+    if (rating !== '') {
+      filteredProducts = filteredProducts.filter((product) => product.rating >= parseFloat(rating));
+    }
+
+    if (fromPrice !== '') {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.price >= parseFloat(fromPrice)
       );
     }
 
-    switch (selectedOption) {
-      case 'name-asc':
-        filteredProducts = filteredProducts.sort((a, b) =>
-          a.title.toUpperCase() > b.title.toUpperCase() ? 1 : -1
-        );
-        break;
-      case 'name-desc':
-        filteredProducts = filteredProducts.sort((a, b) =>
-          a.title.toUpperCase() < b.title.toUpperCase() ? 1 : -1
-        );
-        break;
-      case 'price-high':
-        filteredProducts = filteredProducts.sort((a, b) => b.price - a.price);
-        break;
-      case 'price-low':
-        filteredProducts = filteredProducts.sort((a, b) => a.price - b.price);
-        break;
-      default:
-        break;
+    if (toPrice !== '') {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.price <= parseFloat(toPrice)
+      );
     }
 
     setSortedProducts(filteredProducts);
@@ -92,30 +101,51 @@ export default function ProductList({ products, onEdit, onDelete }: Props) {
 
   return (
     <>
-      {router.pathname === '/admin' && (
         <div className='flex justify-between items-center mb-4'>
           <h1 className='text-3xl font-semibold'>Products</h1>
           <div>
             <select value={sortOption} onChange={handleSortChange}>
-              <option value='default'>Sort by...</option>
-              <option value='name-asc'>Name A-Z</option>
-              <option value='name-desc'>Name Z-A</option>
-              <option value='price-high'>Price High to Low</option>
-              <option value='price-low'>Price Low to High</option>
+			<option value='default'>Sort by...</option>
+            <option value='name-asc'>Name A-Z</option>
+            <option value='name-desc'>Name Z-A</option>
+            <option value='price-high'>Price High to Low</option>
+            <option value='price-low'>Price Low to High</option>
+            <option value='rating'>Rating</option>
+            <option value='stock'>Stock</option>
             </select>
             <select value={selectedCategory} onChange={handleCategoryChange}>
-              <option value='all'>All Categories</option>
-              {[...new Set(products.map((product) => product.category))].map(
-                (category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                )
-              )}
-            </select>
-          </div>
+            <option value='all'>All Categories</option>
+            {[...new Set(products.map((product) => product.category))].map(
+              (category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              )
+            )}
+          </select>
+          <input
+            type='number'
+            step='0.5'
+            min='1'
+            max='5'
+            placeholder='Rating'
+            value={ratingFilter}
+            onChange={handleRatingFilterChange}
+          />
+          <input
+            type='number'
+            placeholder='Price from'
+            value={priceFrom}
+            onChange={handlePriceFromChange}
+          />
+          <input
+            type='number'
+            placeholder='Price to'
+            value={priceTo}
+            onChange={handlePriceToChange}
+          />
         </div>
-      )}
+        </div>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
           {sortedProducts.map((product) => (

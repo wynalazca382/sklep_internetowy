@@ -87,7 +87,6 @@ const Home =() => {
     <>
       <Header onCartIconClick={handleCartIconClick} />
       <Drawer isOpen={isDrawerOpen} onCartIconClick={handleCartIconClick}>
-        {/* Wykorzystaj ProductEditor do edycji i dodawania produktów */}
         <ProductEditor product={selectedProduct} onClose={() => setIsDrawerOpen(false)} handleSave={handleSaveFunction} />
         <Cart />
       </Drawer>
