@@ -1,3 +1,5 @@
+import ProductCard from "./ProductCard"
+import { Product } from "@/types.d"
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import ProductCard from './ProductCard';
