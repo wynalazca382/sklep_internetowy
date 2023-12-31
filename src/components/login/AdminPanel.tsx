@@ -7,6 +7,8 @@ import ProductEditor from "@/components/products/ProductEditor"; // Import kompo
 import { useProductsStore } from "@/stores/useProductsStore";
 import { db } from '../../utils/firebase';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { useUser, useSession } from '@clerk/clerk-react';
 
 const Home =() => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -14,7 +16,16 @@ const Home =() => {
   const [isEdited, setEdited] = useState(false); 
   const router = useRouter();
   const { products, isLoading, error, fetchData, deleteProduct } = useProductsStore();
+  const { session } = useSession();
 
+  if (
+    !session ||
+    !session.user ||
+    !session.user.organizationMemberships ||
+    session.user.organizationMemberships.length === 0
+  ) {
+    router.push('/');
+  }
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -90,7 +101,6 @@ const Home =() => {
         <ProductEditor product={selectedProduct} onClose={() => setIsDrawerOpen(false)} handleSave={handleSaveFunction} />
         <Cart />
       </Drawer>
-      <h1>Admin panel</h1>
       <main className="container mx-auto md:w-10/12 py-8 px-4">
         <div className="mb-4">
           <button onClick={handleAddProduct} className="bg-blue-500 text-white px-4 py-2 rounded">

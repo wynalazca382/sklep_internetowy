@@ -31,7 +31,7 @@ export const useProductsStore = create<State & Actions>((set) => ({
       const snapshot = await collectionRef.get();
       const data = snapshot.docs.map((doc) => ({
         docId: doc.id,
-        ...(doc.data() as Product), // Rzutowanie na Product
+        ...(doc.data() as Product),
       }));
 
       console.log('Data:', data);
