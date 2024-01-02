@@ -3,13 +3,13 @@ import { useProductsStore } from "../../stores/useProductsStore";
 import { useCartStore } from "../../stores/useCartStore";
 import { Product } from "@/types.d";
 import { useRouter } from "next/router";
-import Link from "next/link";
 
 interface Props {
   product: Product;
 }
 
 export default function ProductCard({ product }: Props) {
+  const router = useRouter();
   const addToCart = useCartStore((state) => state.addToCart);
 
   return (
@@ -30,10 +30,12 @@ export default function ProductCard({ product }: Props) {
         <h2 className="text-lg font-semibold">{product.title}</h2>
         <p className="text-gray-600 flex-1">{product.description}</p>
         <div className="mt-4 flex items-center">
-          <button type="button" className="bg-gray-500 text-white font-semibold py-1 px-2 rounded hover:bg-gray-400">
-            <Link href={`/${product.id}`}>
-              View Details
-            </Link>
+          <button
+            type="button"
+            className="bg-gray-500 text-white font-semibold py-1 px-2 rounded hover:bg-gray-400"
+            onClick={() => router.push(`/products/${product.id}`)}
+          >
+            View Details
           </button>
           <button
             type="button"
