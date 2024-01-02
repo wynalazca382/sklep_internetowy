@@ -1,4 +1,3 @@
-// stores/useProductsStore.ts
 import { create } from 'zustand';
 import { db } from '../utils/firebase';
 
@@ -10,6 +9,7 @@ interface State {
 
 interface Actions {
   fetchData: () => Promise<void>;
+  fetchProductDetails: (productId: string) => Promise<void>; // Dodana funkcja do pobierania szczegółów produktu
 }
 
 const INITIAL_STATE: State = {
@@ -41,5 +41,25 @@ export const useProductsStore = create<State & Actions>((set) => ({
       set({ error, isLoading: false });
     }
   },
-}));
+  fetchProductDetails: async (productId: string) => {
+    try {
+      console.log('Fetching product details...');
+      set({ isLoading: true, error: null });
 
+      const productRef = db.collection('products').doc(productId);
+      const doc = await productRef.get();
+
+      if (doc.exists) {
+        const productData = { docId: doc.id, ...(doc.data() as Product) };
+        console.log('Product Details:', productData);
+        set({ products: [productData], isLoading: false }); // Zapisuje tylko jeden produkt do stanu
+      } else {
+        console.log('No such document!');
+        set({ error: 'Product not found', isLoading: false });
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      set({ error, isLoading: false });
+    }
+  },
+}));
