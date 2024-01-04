@@ -33,7 +33,7 @@ export default function ProductCard({ product }: Props) {
           <button
             type="button"
             className="bg-gray-500 text-white font-semibold py-1 px-2 rounded hover:bg-gray-400"
-            onClick={() => router.push(`/products/${product.id}`)}
+            onClick={() => router.push(`/${product.docId}`)}
           >
             View Details
           </button>
