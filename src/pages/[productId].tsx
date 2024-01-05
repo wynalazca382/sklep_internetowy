@@ -98,14 +98,17 @@ export default function ProductDetails() {
             <p>{productDetails.description}</p>
             <p>Price: ${productDetails.price.toFixed(2)}</p>
             <div className='flex items-center justify-between'>
-              <div className='flex items-center'>
-                <p className='mr-2'>Rating:</p>
-                {productDetails.rating > 0 &&
-                  Array.from({ length: productDetails.rating }).map((_, index) => (
-                    <FontAwesomeIcon key={index} icon={solidStar} className='text-yellow-500' />
-                  ))}
-                <p>({productDetails.rating})</p>
-              </div>
+            <div className='flex items-center'>
+              <p className='mr-2'>Rating:</p>
+              {productDetails.rating > 0 &&
+                Array.from({ length: Math.floor(productDetails.rating) }).map((_, index) => (
+                  <FontAwesomeIcon key={index} icon={solidStar} className='text-yellow-500' />
+                ))}
+              {productDetails.rating % 1 >= 0.51 && (
+                <FontAwesomeIcon icon={solidStar} className='text-yellow-500' />
+              )}
+              <p>({productDetails.rating.toFixed(2)})</p>
+            </div>
             </div>
             <button onClick={() => addToCart(productDetails)}>Add to Cart</button>
           </div>
