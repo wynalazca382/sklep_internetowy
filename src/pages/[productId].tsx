@@ -16,8 +16,10 @@ export default function ProductDetails() {
   const addToCart = useCartStore((state) => state.addToCart);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [startIndex, setStartIndex] = useState(0);
-  const itemsPerPage = 3;
+  const [startIndexSameCategory, setStartIndexSameCategory] = useState(0);
+  const [startIndexOthersBought, setStartIndexOthersBought] = useState(0);
+  const itemsPerPage = 4;
+  const items = 12;
 
   const { productId } = router.query;
 
@@ -33,13 +35,44 @@ export default function ProductDetails() {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const nextPage = () => {
-    setStartIndex((prev) => Math.min(prev + itemsPerPage, products.length - itemsPerPage));
+  const nextPageSameCategory = () => {
+    const productsInCategory = getProductsInCategory(); 
+    setStartIndexSameCategory((prev) => Math.min(prev + itemsPerPage, productsInCategory.length - itemsPerPage));
   };
 
-  const prevPage = () => {
-    setStartIndex((prev) => Math.max(prev - itemsPerPage, 0));
+  const prevPageSameCategory = () => {
+    setStartIndexSameCategory((prev) => Math.max(prev - itemsPerPage, 0));
   };
+
+  const nextPageOthersBought = () => {
+    const topRatedProducts = getTopRatedProducts(); 
+    setStartIndexOthersBought((prev) => Math.min(prev + itemsPerPage, topRatedProducts.length - itemsPerPage));
+  };
+
+  const prevPageOthersBought = () => {
+    setStartIndexOthersBought((prev) => Math.max(prev - itemsPerPage, 0));
+  };
+
+  const getProductsInCategory = () => {
+    return products.filter(
+      (prod) => prod.category === productDetails?.category && prod.id !== productDetails?.id
+    );
+  };
+
+  const getTopRatedProducts = () => {
+    return products.filter(
+      (prod) => prod.rating >= 4 && prod.id !== productDetails?.id
+    );
+  };
+
+  const canGoNextSameCategory = startIndexSameCategory + itemsPerPage < getProductsInCategory().length;
+  const canGoPrevSameCategory = startIndexSameCategory > 0;
+
+  const canGoNextOthersBought = startIndexOthersBought + itemsPerPage < items;
+  const canGoPrevOthersBought = startIndexOthersBought > 0;
+
+  let filteredProductsSameCategory = getProductsInCategory().slice(startIndexSameCategory, startIndexSameCategory + items);
+  let filteredTopProductsOthersBought = getTopRatedProducts().slice(startIndexOthersBought, startIndexOthersBought + items);
 
   return (
     <>
@@ -48,8 +81,8 @@ export default function ProductDetails() {
         <Cart />
       </Drawer>
       <div>
-        {!isDataLoaded && <p>Ładowanie...</p>}
-        {isDataLoaded && !productDetails && <p>Produkt nie znaleziony</p>}
+        {!isDataLoaded && <p>Loading...</p>}
+        {isDataLoaded && !productDetails && <p>Product not found</p>}
         {isDataLoaded && productDetails && (
           <div className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl flex flex-col p-4 relative'>
             <h1 className='text-2xl font-semibold mb-2'>{productDetails.title}</h1>
@@ -63,10 +96,10 @@ export default function ProductDetails() {
               />
             </div>
             <p>{productDetails.description}</p>
-            <p>Cena: ${productDetails.price.toFixed(2)}</p>
+            <p>Price: ${productDetails.price.toFixed(2)}</p>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
-                <p className='mr-2'>Ocena:</p>
+                <p className='mr-2'>Rating:</p>
                 {productDetails.rating > 0 &&
                   Array.from({ length: productDetails.rating }).map((_, index) => (
                     <FontAwesomeIcon key={index} icon={solidStar} className='text-yellow-500' />
@@ -74,25 +107,69 @@ export default function ProductDetails() {
                 <p>({productDetails.rating})</p>
               </div>
             </div>
-            <button onClick={() => addToCart(productDetails)}>Dodaj do koszyka</button>
+            <button onClick={() => addToCart(productDetails)}>Add to Cart</button>
           </div>
         )}
       </div>
       {isDataLoaded && productDetails && (
         <div className='container mx-auto px-4 mt-8'>
-          <h2 className='text-2xl font-semibold mb-4'>Inne produkty z tej samej kategorii</h2>
-          <div className='flex items-center justify-center'>
-            <button onClick={prevPage} disabled={startIndex === 0} className="px-4 py-2 bg-gray-300 rounded">
+          <h2 className='text-2xl font-semibold mb-4'>Other Products in the Same Category</h2>
+          <div className='flex items-center justify-center w-full mx-auto'>
+            <button
+              onClick={prevPageSameCategory}
+              disabled={!canGoPrevSameCategory}
+              className={`px-4 py-2 bg-gray-300 rounded transition-transform duration-300 transform-gpu hover:scale-105 ${
+                !canGoPrevSameCategory ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
               {'<'}
             </button>
-            <div>
+            <div className='mx-4'>
               <ProductGallery
-                products={products.filter((prod) => prod.category === productDetails.category && prod.id !== productDetails.id)}
-                startIndex={startIndex}
+                products={filteredProductsSameCategory}
+                startIndex={startIndexSameCategory}
                 itemsPerPage={itemsPerPage}
               />
             </div>
-            <button onClick={nextPage} disabled={startIndex + itemsPerPage >= products.length} className="px-4 py-2 bg-gray-300 rounded">
+            <button
+              onClick={nextPageSameCategory}
+              disabled={!canGoNextSameCategory}
+              className={`px-4 py-2 bg-gray-300 rounded transition-transform duration-300 transform-gpu hover:scale-105 ${
+                !canGoNextSameCategory ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {'>'}
+            </button>
+          </div>
+        </div>
+      )}
+      {isDataLoaded && productDetails && (
+        <div className='container mx-auto px-4 mt-8'>
+          <h2 className='text-2xl font-semibold mb-4'>Others Also Bought</h2>
+          <div className='flex items-center justify-center w-full mx-auto'>
+            <button
+              onClick={prevPageOthersBought}
+              disabled={!canGoPrevOthersBought}
+              className={`px-4 py-2 bg-gray-300 rounded transition-transform duration-300 transform-gpu hover:scale-105 ${
+                !canGoPrevOthersBought ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {'<'}
+            </button>
+            <div className='mx-4'>
+              <ProductGallery
+                products={filteredTopProductsOthersBought}
+                startIndex={startIndexOthersBought}
+                itemsPerPage={itemsPerPage}
+              />
+            </div>
+            <button
+              onClick={nextPageOthersBought}
+              disabled={!canGoNextOthersBought}
+              className={`px-4 py-2 bg-gray-300 rounded transition-transform duration-300 transform-gpu hover:scale-105 ${
+                !canGoNextOthersBought ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
               {'>'}
             </button>
           </div>
