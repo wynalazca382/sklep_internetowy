@@ -45,18 +45,15 @@ export const useProductsStore = create<State & Actions>((set) => ({
     try {
       console.log('Fetching product details...');
       set({ isLoading: true, error: null });
-  
+
       const productRef = db.collection('products').doc(productId);
       const doc = await productRef.get();
-  
+
       if (doc.exists) {
         const productData = { docId: doc.id, ...(doc.data() as Product) };
         console.log('Product Details:', productData);
-  
-        set((state) => ({
-          products: [...state.products, productData],
-          isLoading: false,
-        }));
+
+        set({ productDetails: productData, isLoading: false });
       } else {
         console.log('No such document!');
         set({ error: 'Product not found', isLoading: false });
@@ -66,5 +63,4 @@ export const useProductsStore = create<State & Actions>((set) => ({
       set({ error, isLoading: false });
     }
   },
-  
 }));

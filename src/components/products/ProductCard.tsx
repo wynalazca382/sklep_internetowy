@@ -3,6 +3,7 @@ import { useProductsStore } from "../../stores/useProductsStore";
 import { useCartStore } from "../../stores/useCartStore";
 import { Product } from "@/types.d";
 import { useRouter } from "next/router";
+import React from "react";
 
 interface Props {
   product: Product;
