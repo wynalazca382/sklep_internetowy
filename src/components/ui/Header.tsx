@@ -44,7 +44,9 @@ export default function Header({ onCartIconClick }: Props) {
         <Link href='/'>
           My E-commerce
         </Link>
+      
         <div className='flex items-center space-x-4'>
+        <Link href='/orders'>Orders</Link>
           <button
             type='button'
             title='Mini Cart'

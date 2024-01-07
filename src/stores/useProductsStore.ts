@@ -40,6 +40,7 @@ export const useProductsStore = create<State & Actions>((set) => ({
       console.error('Fetch error:', error);
       set({ error, isLoading: false });
     }
+    
   },
   fetchProductDetails: async (productId: string) => {
     try {
