@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import { db } from '../utils/firebase';
-import { useSession, useUser } from "@clerk/clerk-react";
-import { getSession } from 'next-auth/react';
-import moment from 'moment';
+
 interface State {
   orders: Order[];
   isLoading: boolean;
